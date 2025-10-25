@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestor de Banca MVP</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- O CSS (style) permanece o mesmo -->
+    <style>
+        :root {
+            --cor-fundo-principal: #1A1B30; 
+            --cor-fundo-componente: #262940; 
+            --cor-texto-principal: #E0E0E0; 
+            --cor-texto-secundario: #A0A0A0; 
+            --cor-texto-quase-preto: #0F0F20; 
+            --acento-verde-vibrante: #00FF8C;  
+            --acento-verde-transparente: rgba(0, 255, 140, 0.2); 
+            --acento-vermelho-vibrante: #FF4444; 
+            --acento-vermelho-transparente: rgba(255, 68, 68, 0.2);
+            --acento-cinza-neutro: #6c757d;    
+            --acento-gradiente-inicio: #A020F0; 
+            --acento-gradiente-fim: #FF00FF;   
+            --gradiente-roxo-magenta: linear-gradient(90deg, var(--acento-gradiente-inicio) 0%, var(--acento-gradiente-fim) 100%);
+            --gradiente-brilho-roxo: rgba(160, 32, 240, 0.3);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--cor-fundo-principal);
+            color: var(--cor-texto-principal);
+            padding-bottom: 80px; 
+        }
+        nav {
+            position: fixed; bottom: 0; left: 0; width: 100%;
+            display: flex; justify-content: space-around;
+            background-color: var(--cor-fundo-componente);
+            border-top: 1px solid #333; z-index: 100;
+        }
+        nav button {
+            background: none; border: none; color: var(--cor-texto-secundario);
+            padding: 15px 10px; font-size: 0.9em; font-weight: 500;
+            cursor: pointer; flex-grow: 1; border-top: 3px solid transparent;
+            transition: color 0.3s ease, border-top-color 0.3s ease;
+        }
+        nav button.active {
+            color: var(--acento-verde-vibrante); 
+            border-top-color: var(--acento-verde-vibrante);
+        }
+        nav button:hover:not(.active) { color: var(--cor-texto-principal); }
+        nav button#btnNavAdicionar { color: var(--acento-gradiente-fim); }
+        nav button#btnNavAdicionar.active {
+            color: var(--acento-verde-vibrante); 
+            border-top-color: var(--acento-verde-vibrante);
+        }
+        .tela {
+            display: none; max-width: 600px; margin: 20px auto;
+            padding: 0 15px; animation: fadeIn 0.3s ease-in-out;
+        }
+        .tela.active { display: block; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        h1, h2 { margin-bottom: 20px; font-weight: 700; color: var(--cor-texto-principal); }
+        h2 { font-size: 1.2em; color: var(--cor-texto-secundario); }
+        
+        #auth-container, #user-container {
+            background-color: var(--cor-fundo-componente);
+            padding: 15px; border-radius: 8px; margin-bottom: 20px;
+            text-align: center;
+        }
+        #user-container {
+            display: none; justify-content: space-between; align-items: center;
+        }
+        #auth-container p, #user-container p {
+            margin-bottom: 10px; color: var(--cor-texto-secundario);
+        }
+        #user-container p { margin-bottom: 0; font-size: 0.9em; }
+        #userName { color: var(--acento-verde-vibrante); font-weight: bold; }
+        button#btnLoginGoogle {
+            background: var(--gradiente-roxo-magenta);
+            color: var(--cor-texto-principal); border: none; padding: 10px 20px;
+            border-radius: 5px; cursor: pointer; font-weight: bold;
+            box-shadow: 0 0 10px var(--gradiente-brilho-roxo);
+        }
+        button#btnLogout {
+            background-color: var(--acento-cinza-neutro);
+            color: var(--cor-texto-principal); border: none; padding: 8px 15px;
+            border-radius: 5px; cursor: pointer; font-size: 0.8em;
+        }
+        .cards-grid {
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 15px; margin-bottom: 30px;
+        }
+        .card {
+            background-color: var(--cor-fundo-componente);
+            border-radius: 8px; padding: 20px; text-align: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            border-top: 2px solid var(--cor-fundo-componente);
+            transition: border-top-color 0.3s ease;
+        }
+        .card h3 {
+            color: var(--cor-texto-secundario); font-size: 0.9em;
+            margin-bottom: 8px; font-weight: 400;
+        }
+        .card p { font-size: 1.8em; font-weight: 700; transition: text-shadow 0.3s ease; }
+        .card p.positivo {
+            color: var(--acento-verde-vibrante);
+            text-shadow: 0 0 10px var(--acento-verde-transparente);
+        }
+        .card p.negativo {
+            color: var(--acento-vermelho-vibrante);
+            text-shadow: 0 0 10px var(--acento-vermelho-transparente);
+        }
+        .card:has(p.positivo):hover { border-top-color: var(--acento-verde-vibrante); }
+        .card:has(p.negativo):hover { border-top-color: var(--acento-vermelho-vibrante); }
+        #grafico-container {
+            background-color: var(--cor-fundo-componente);
+            padding: 20px; border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+        #form-adicionar { display: flex; flex-direction: column; gap: 20px; }
+        .form-grupo { display: flex; flex-direction: column; }
+        .form-grupo label {
+            margin-bottom: 8px; color: var(--cor-texto-secundario); font-size: 0.9em;
+        }
+        .form-grupo input {
+            background-color: var(--cor-fundo-componente);
+            border: 1px solid #444; color: var(--cor-texto-principal);
+            padding: 15px; border-radius: 5px; font-size: 1.2em;
+            -moz-appearance: textfield; appearance: textfield;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .form-grupo input:focus {
+            outline: none; border-color: var(--acento-verde-vibrante);
+            box-shadow: 0 0 10px var(--acento-verde-transparente);
+        }
+        .form-grupo input::-webkit-outer-spin-button,
+        .form-grupo input::-webkit-inner-spin-button {
+            -webkit-appearance: none; margin: 0;
+        }
+        .botoes-resultado {
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 15px; margin-top: 10px;
+        }
+        .botoes-resultado button {
+            padding: 15px; font-size: 1em; font-weight: 700;
+            border: none; border-radius: 5px; cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.3s ease;
+        }
+        .botoes-resultado button:active { transform: scale(0.95); }
+        #btnGanhei {
+            background-color: var(--acento-verde-vibrante);
+            color: var(--cor-texto-quase-preto); 
+            box-shadow: 0 0 10px var(--acento-verde-transparente);
+        }
+        #btnPerdi {
+            background-color: var(--acento-vermelho-vibrante);
+            color: var(--cor-texto-principal);
+            box-shadow: 0 0 10px var(--acento-vermelho-transparente);
+        }
+        #btnDevolvida {
+            background-color: var(--acento-cinza-neutro);
+            color: var(--cor-texto-principal);
+            grid-column: 1 / -1; 
+        }
+        #listaHistorico { display: flex; flex-direction: column; gap: 10px; }
+        .item-historico {
+            display: flex; justify-content: space-between; align-items: center;
+            background-color: var(--cor-fundo-componente);
+            padding: 15px; border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            border-left: 3px solid transparent; 
+            transition: border-left-color 0.3s ease;
+        }
+        .item-historico:hover { border-left-color: var(--cor-texto-secundario); }
+        .item-historico:has(.positivo):hover { border-left-color: var(--acento-verde-vibrante); }
+        .item-historico:has(.negativo):hover { border-left-color: var(--acento-vermelho-vibrante); }
+        .item-historico div p:first-child { font-weight: 500; font-size: 1.1em; }
+        .item-historico div p:first-child.positivo {
+            color: var(--acento-verde-vibrante);
+            text-shadow: 0 0 5px var(--acento-verde-transparente);
+        }
+        .item-historico div p:first-child.negativo {
+            color: var(--acento-vermelho-vibrante);
+            text-shadow: 0 0 5px var(--acento-vermelho-transparente);
+        }
+        .item-historico div p:first-child.neutro { color: var(--cor-texto-secundario); }
+        .item-historico div p.detalhes {
+            font-size: 0.8em; color: var(--cor-texto-secundario); margin-top: 5px;
+        }
+        .item-historico button.btn-delete {
+            background: none; border: none; color: var(--acento-vermelho-vibrante);
+            font-size: 1.2em; font-weight: bold; cursor: pointer;
+            transition: color 0.2s ease;
+        }
+        .item-historico button.btn-delete:hover { color: #FF7070; }
+        #btnLimparHistorico {
+            margin-top: 20px; background: var(--gradiente-roxo-magenta); 
+            color: var(--cor-texto-principal); border: none; padding: 15px;
+            border-radius: 5px; cursor: pointer; width: 100%;
+            font-weight: 700; font-size: 1em;
+            box-shadow: 0 0 10px var(--gradiente-brilho-roxo);
+            transition: opacity 0.3s ease;
+        }
+        #btnLimparHistorico:hover { opacity: 0.9; }
+    </style>
+</head>
+<body>
+
+    <!-- O HTML do body permanece o mesmo -->
+    <main id="telaDashboard" class="tela active">
+        <h1>Meu Dashboard</h1>
+        <div id="auth-container">
+            <p>Faça login para salvar seus dados na nuvem e acessar de qualquer dispositivo!</p>
+            <button id="btnLoginGoogle">Login com Google</button>
+        </div>
+        <div id="user-container">
+            <p>Logado como: <span id="userName"></span></p>
+            <button id="btnLogout">Sair</button>
+        </div>
+        <div class="cards-grid">
+            <div class="card">
+                <h3>Lucro/Prejuízo</h3>
+                <p id="lucroTotalEl">R$ 0,00</p>
+            </div>
+            <div class="card">
+                <h3>ROI</h3>
+                <p id="roiEl">0%</p>
+            </div>
+            <div class="card">
+                <h3>Taxa de Acerto</h3>
+                <p id="winrateEl">0%</p>
+            </div>
+            <div class="card">
+                <h3>Total Apostado</h3>
+                <p id="totalInvestidoEl">R$ 0,00</p>
+            </div>
+        </div>
+        <h2>Evolução da Banca</h2>
+        <div id="grafico-container">
+            <canvas id="graficoEvolucao" height="250"></canvas>
+        </div>
+    </main>
+    <main id="telaAdicionar" class="tela">
+        <h1>Nova Aposta</h1>
+        <form id="form-adicionar" onsubmit="return false;">
+            <div class="form-grupo">
+                <label for="inputStake">Valor Apostado (R$)</label>
+                <input type="number" id="inputStake" placeholder="10.00" step="0.01">
+            </div>
+            <div class="form-grupo">
+                <label for="inputOdd">Odd</label>
+                <input type="number" id="inputOdd" placeholder="1.90" step="0.01">
+            </div>
+            <div class="botoes-resultado">
+                <button type="button" id="btnGanhei">GANHEI</button>
+                <button type="button" id="btnPerdi">PERDI</button>
+                <button type="button" id="btnDevolvida">DEVOLVIDA</button>
+            </div>
+        </form>
+    </main>
+    <main id="telaHistorico" class="tela">
+        <h1>Histórico de Apostas</h1>
+        <div id="listaHistorico"></div>
+        <button id="btnLimparHistorico">Limpar Histórico</button>
+    </main>
+    <nav>
+        <button id="btnNavDashboard" class="active">Dashboard</button>
+        <button id="btnNavAdicionar">Adicionar</button>
+        <button id="btnNavHistorico">Histórico</button>
+    </nav>
+
+
+    <!-- ========================================================
+       JAVASCRIPT DO APLICATIVO (ATUALIZADO PARA v12+ MODULAR)
+       ======================================================== -->
+    
+    <!-- 
+      Usamos type="module" para poder usar 'import' 
+      Este é o único <script> que precisamos.
+    -->
+    <script type="module">
+    
+        // --- 0. IMPORTS E CONFIGURAÇÃO DO FIREBASE ---
+        
+        // Importa as funções que precisamos da SDK v12+
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+        import { 
+            getAuth, 
+            GoogleAuthProvider, 
+            onAuthStateChanged, 
+            signInWithPopup, 
+            signOut 
+        } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+        import { 
+            getFirestore, 
+            collection, 
+            doc, 
+            setDoc, 
+            deleteDoc, 
+            getDocs, 
+            query, 
+            where, 
+            orderBy, 
+            writeBatch 
+        } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+
+        // SUA CONFIGURAÇÃO (COLE SUA API KEY AQUI!)
+        const firebaseConfig = {
+            // !! IMPORTANTE !!
+            // Cole sua apiKey que você censurou (começa com "AIzaSy...")
+            apiKey: "SUA_API_KEY_AQUI", 
+            authDomain: "gestor-banca-mvp.firebaseapp.com",
+            projectId: "gestor-banca-mvp",
+            storageBucket: "gestor-banca-mvp.firebasestorage.app",
+            messagingSenderId: "1002853212673",
+            appId: "1:1002853212673:web:e9155a35349918c1561600",
+            measurementId: "G-SSYR996ET4"
+        };
+
+        // Inicializa o Firebase e os serviços
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const provider = new GoogleAuthProvider();
+
+        
+        // --- 1. REFERÊNCIAS AOS ELEMENTOS DO DOM ---
+        
+        // Espera o DOM carregar para rodar o app
+        document.addEventListener('DOMContentLoaded', () => {
+        
+            // Telas
+            const telaDashboard = document.getElementById('telaDashboard');
+            const telaAdicionar = document.getElementById('telaAdicionar');
+            const telaHistorico = document.getElementById('telaHistorico');
+            const telas = [telaDashboard, telaAdicionar, telaHistorico];
+
+            // Botões de Navegação
+            const btnNavDashboard = document.getElementById('btnNavDashboard');
+            const btnNavAdicionar = document.getElementById('btnNavAdicionar');
+            const btnNavHistorico = document.getElementById('btnNavHistorico');
+            const navButtons = [btnNavDashboard, btnNavAdicionar, btnNavHistorico];
+
+            // Autenticação
+            const authContainer = document.getElementById('auth-container');
+            const userContainer = document.getElementById('user-container');
+            const btnLoginGoogle = document.getElementById('btnLoginGoogle');
+            const btnLogout = document.getElementById('btnLogout');
+            const userNameEl = document.getElementById('userName');
+
+            // Formulário Adicionar
+            const inputStake = document.getElementById('inputStake');
+            const inputOdd = document.getElementById('inputOdd');
+            const btnGanhei = document.getElementById('btnGanhei');
+            const btnPerdi = document.getElementById('btnPerdi');
+            const btnDevolvida = document.getElementById('btnDevolvida');
+
+            // Dashboard Cards
+            const lucroTotalEl = document.getElementById('lucroTotalEl');
+            const roiEl = document.getElementById('roiEl');
+            const winrateEl = document.getElementById('winrateEl');
+            const totalInvestidoEl = document.getElementById('totalInvestidoEl');
+            
+            // Histórico
+            const listaHistorico = document.getElementById('listaHistorico');
+            const btnLimparHistorico = document.getElementById('btnLimparHistorico');
+
+            // Gráfico
+            const ctx = document.getElementById('graficoEvolucao').getContext('2d');
+            let meuGrafico; 
+
+            // --- 2. ESTADO DO APLICATIVO (DADOS) ---
+            let apostas = []; 
+            let currentUser = null; 
+            const DB_KEY = 'gestorBancaMVP_apostas'; 
+            
+            const estiloComputado = getComputedStyle(document.body);
+            const corVerdeNeon = estiloComputado.getPropertyValue('--acento-verde-vibrante');
+            const corTextoSecundario = estiloComputado.getPropertyValue('--cor-texto-secundario');
+            const corTextoPrincipal = estiloComputado.getPropertyValue('--cor-texto-principal');
+            const corFundoComponente = estiloComputado.getPropertyValue('--cor-fundo-componente');
+
+
+            // --- 3. FUNÇÕES DE AUTENTICAÇÃO (Modular) ---
+            
+            function atualizarUIAuth() {
+                if (currentUser) {
+                    authContainer.style.display = 'none';
+                    userContainer.style.display = 'flex';
+                    userNameEl.textContent = currentUser.displayName || currentUser.email;
+                } else {
+                    authContainer.style.display = 'block';
+                    userContainer.style.display = 'none';
+                    userNameEl.textContent = '';
+                }
+            }
+
+            // Ouve as mudanças de estado (Login, Logout)
+            onAuthStateChanged(auth, async (user) => {
+                if (user) {
+                    currentUser = user;
+                    atualizarUIAuth();
+                    await syncLocalToFirestore();
+                } else {
+                    currentUser = null;
+                    atualizarUIAuth();
+                }
+                navegar('telaDashboard');
+            });
+
+            // Lógica de Login
+            btnLoginGoogle.addEventListener('click', () => {
+                signInWithPopup(auth, provider)
+                    .catch(error => console.error("Erro no login:", error));
+            });
+
+            // Lógica de Logout
+            btnLogout.addEventListener('click', () => {
+                signOut(auth)
+                    .catch(error => console.error("Erro no logout:", error));
+            });
+            
+            // Lógica de Sincronização (Modular)
+            async function syncLocalToFirestore() {
+                const localApostas = JSON.parse(localStorage.getItem(DB_KEY)) || [];
+                
+                if (localApostas.length > 0 && currentUser) {
+                    if (confirm(`Encontramos ${localApostas.length} apostas salvas localmente. Deseja enviá-las para sua conta na nuvem?`)) {
+                        const batch = writeBatch(db); // Modular
+                        
+                        localApostas.forEach(aposta => {
+                            aposta.userId = currentUser.uid; 
+                            const docRef = doc(db, 'apostas', aposta.id); // Modular
+                            batch.set(docRef, aposta, { merge: true }); // Modular
+                        });
+                        
+                        try {
+                            await batch.commit(); // Modular
+                            console.log("Dados locais sincronizados com sucesso!");
+                            localStorage.removeItem(DB_KEY);
+                        } catch (e) {
+                            console.error("Erro ao sincronizar dados:", e);
+                            alert("Houve um erro ao sincronizar seus dados. Tente novamente.");
+                        }
+                    }
+                }
+                await atualizarDados();
+                renderizarGrafico();
+            }
+
+            // --- 4. FUNÇÕES DE NAVEGAÇÃO (Async) ---
+            async function navegar(telaId) {
+                telas.forEach(tela => tela.classList.remove('active'));
+                navButtons.forEach(btn => btn.classList.remove('active'));
+
+                if (telaId === 'telaDashboard') {
+                    telaDashboard.classList.add('active');
+                    btnNavDashboard.classList.add('active');
+                    await atualizarDados(); 
+                    renderizarGrafico();    
+                } else if (telaId === 'telaAdicionar') {
+                    telaAdicionar.classList.add('active');
+                    btnNavAdicionar.classList.add('active');
+                } else if (telaId === 'telaHistorico') {
+                    telaHistorico.classList.add('active');
+                    btnNavHistorico.classList.add('active');
+                    await atualizarDados(); 
+                }
+            }
+            btnNavDashboard.addEventListener('click', () => navegar('telaDashboard'));
+            btnNavAdicionar.addEventListener('click', () => navegar('telaAdicionar'));
+            btnNavHistorico.addEventListener('click', () => navegar('telaHistorico'));
+
+            // --- 5. FUNÇÕES DE DADOS (CRUD Modular) ---
+            async function carregarApostas() {
+                if (currentUser) {
+                    try {
+                        const apostasRef = collection(db, 'apostas'); // Modular
+                        const q = query(apostasRef, where('userId', '==', currentUser.uid), orderBy('data', 'asc')); // Modular
+                        const snapshot = await getDocs(q); // Modular
+                        apostas = snapshot.docs.map(doc => doc.data());
+                    } catch (e) {
+                        console.error("Erro ao carregar do Firestore:", e);
+                        apostas = [];
+                    }
+                } else {
+                    apostas = JSON.parse(localStorage.getItem(DB_KEY)) || [];
+                }
+            }
+            
+            async function adicionarAposta(resultado) {
+                const stake = parseFloat(inputStake.value);
+                const odd = parseFloat(inputOdd.value);
+                if (isNaN(stake) || isNaN(odd) || stake <= 0 || odd <= 1) {
+                    alert('Valores inválidos. Stake deve ser > 0 e Odd > 1.'); return;
+                }
+                let lucro = 0;
+                if (resultado === 'ganha') { lucro = (stake * odd) - stake; }
+                else if (resultado === 'perdida') { lucro = -stake; }
+                
+                const novaAposta = {
+                    id: Date.now().toString(),
+                    stake: stake, odd: odd, resultado: resultado, lucro: lucro,
+                    data: new Date().toISOString(),
+                    userId: currentUser ? currentUser.uid : null 
+                };
+                
+                if (currentUser) {
+                    try {
+                        await setDoc(doc(db, 'apostas', novaAposta.id), novaAposta); // Modular
+                    } catch (e) {
+                        console.error("Erro ao salvar no Firestore:", e);
+                        alert("Erro ao salvar. Verifique sua conexão."); return;
+                    }
+                } else {
+                    const localApostas = JSON.parse(localStorage.getItem(DB_KEY)) || [];
+                    localApostas.push(novaAposta);
+                    localStorage.setItem(DB_KEY, JSON.stringify(localApostas));
+                }
+                inputStake.value = ''; inputOdd.value = '';
+                navegar('telaDashboard');
+            }
+            
+            async function deletarAposta(id) {
+                if (confirm('Tem certeza que deseja excluir esta aposta?')) {
+                    if (currentUser) {
+                        try {
+                            await deleteDoc(doc(db, 'apostas', id)); // Modular
+                        } catch (e) { console.error("Erro ao deletar do Firestore:", e); return; }
+                    } else {
+                        let localApostas = JSON.parse(localStorage.getItem(DB_KEY)) || [];
+                        localApostas = localApostas.filter(aposta => aposta.id !== id);
+                        localStorage.setItem(DB_KEY, JSON.stringify(localApostas));
+                    }
+                    await atualizarDados(); 
+                    if (telaDashboard.classList.contains('active')) { renderizarGrafico(); }
+                }
+            }
+            
+            async function limparHistorico() {
+                if (confirm('ATENÇÃO! Isso apagará TODAS as suas apostas salvas. Deseja continuar?')) {
+                    if (currentUser) {
+                        try {
+                            const apostasRef = collection(db, 'apostas'); // Modular
+                            const q = query(apostasRef, where('userId', '==', currentUser.uid)); // Modular
+                            const snapshot = await getDocs(q); // Modular
+                            const batch = writeBatch(db); // Modular
+                            snapshot.docs.forEach(doc => batch.delete(doc.ref));
+                            await batch.commit(); // Modular
+                        } catch (e) { console.error("Erro ao limpar o Firestore:", e); return; }
+                    } else {
+                        localStorage.removeItem(DB_KEY);
+                    }
+                    await atualizarDados();
+                    if (telaDashboard.classList.contains('active')) { renderizarGrafico(); }
+                }
+            }
+            
+            btnGanhei.addEventListener('click', () => adicionarAposta('ganha'));
+            btnPerdi.addEventListener('click', () => adicionarAposta('perdida'));
+            btnDevolvida.addEventListener('click', () => adicionarAposta('devolvida'));
+            
+            listaHistorico.addEventListener('click', (e) => {
+                if (e.target.classList.contains('btn-delete')) {
+                    deletarAposta(e.target.dataset.id);
+                }
+            });
+            btnLimparHistorico.addEventListener('click', limparHistorico);
+
+            // --- 6. FUNÇÕES DE RENDERIZAÇÃO (Idênticas a antes) ---
+            async function atualizarDados() {
+                await carregarApostas(); 
+                renderizarDashboard();   
+                renderizarHistorico(); 
+            }
+            function formatarDinheiro(valor) {
+                return valor.toLocaleString('pt-br', { style: 'currency', currency: 'BRL' });
+            }
+            function renderizarDashboard() {
+                let lucroTotal = 0, totalInvestido = 0, ganhas = 0, totalApostasValidas = 0; 
+                apostas.forEach(aposta => {
+                    lucroTotal += aposta.lucro;
+                    if (aposta.resultado !== 'devolvida') {
+                        totalInvestido += aposta.stake;
+                        totalApostasValidas++;
+                        if(aposta.resultado === 'ganha') ganhas++;
+                    }
+                });
+                const roi = totalInvestido > 0 ? (lucroTotal / totalInvestido) * 100 : 0;
+                const winrate = totalApostasValidas > 0 ? (ganhas / totalApostasValidas) * 100 : 0;
+                lucroTotalEl.textContent = formatarDinheiro(lucroTotal);
+                lucroTotalEl.className = (lucroTotal > 0) ? 'positivo' : (lucroTotal < 0) ? 'negativo' : '';
+                roiEl.textContent = `${roi.toFixed(1)}%`;
+                roiEl.className = (roi > 0) ? 'positivo' : (roi < 0) ? 'negativo' : '';
+                winrateEl.textContent = `${winrate.toFixed(1)}%`;
+                totalInvestidoEl.textContent = formatarDinheiro(totalInvestido);
+            }
+            function renderizarHistorico() {
+                listaHistorico.innerHTML = ''; 
+                if (apostas.length === 0) {
+                    listaHistorico.innerHTML = '<p style="text-align: center; color: var(--cor-texto-secundario);">Nenhuma aposta registrada.</p>';
+                    return;
+                }
+                const apostasReversas = [...apostas].reverse(); 
+                apostasReversas.forEach(aposta => {
+                    let classeResultado = 'neutro', sinalLucro = '';
+                    if (aposta.lucro > 0) { classeResultado = 'positivo'; sinalLucro = '+'; }
+                    else if (aposta.lucro < 0) { classeResultado = 'negativo'; }
+                    const dataFormatada = new Date(aposta.data).toLocaleString('pt-BR', {
+                        day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' 
+                    });
+                    const itemHTML = `
+                        <div class="item-historico">
+                            <div>
+                                <p class="${classeResultado}">
+                                    ${sinalLucro}${formatarDinheiro(aposta.lucro)}
+                                </p>
+                                <p class="detalhes">
+                                    Apostado: ${formatarDinheiro(aposta.stake)} @ ${aposta.odd.toFixed(2)} (${aposta.resultado})
+                                    <br> ${dataFormatada}
+                                </p>
+                            </div>
+                            <button class="btn-delete" data-id="${aposta.id}">X</button>
+                        </div>`;
+                    listaHistorico.innerHTML += itemHTML;
+                });
+            }
+            function renderizarGrafico() {
+                if (meuGrafico) { meuGrafico.destroy(); }
+                let lucroAcumulado = 0;
+                const dadosGrafico = [0]; 
+                const labelsGrafico = ['Início'];
+                apostas.forEach((aposta, index) => {
+                    lucroAcumulado += aposta.lucro;
+                    dadosGrafico.push(lucroAcumulado);
+                    labelsGrafico.push(`Aposta ${index + 1}`);
+                });
+                meuGrafico = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labelsGrafico,
+                        datasets: [{
+                            label: 'Lucro Acumulado',
+                            data: dadosGrafico,
+                            borderColor: corVerdeNeon, 
+                            borderWidth: 2, 
+                            backgroundColor: (context) => {
+                                const chart = context.chart;
+                                const {ctx, chartArea} = chart;
+                                if (!chartArea) { return null; }
+                                const gradient = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+                                gradient.addColorStop(0, 'rgba(0, 255, 140, 0.4)'); 
+                                gradient.addColorStop(1, 'rgba(0, 255, 140, 0)');  
+                                return gradient;
+                            },
+                            fill: true, tension: 0.4, 
+                            pointBackgroundColor: corVerdeNeon, 
+                            pointBorderColor: corFundoComponente,
+                            pointRadius: 4, pointHoverRadius: 6,
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: corVerdeNeon
+                        }]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false, 
+                        scales: {
+                            y: { ticks: { color: corTextoSecundario }, grid: { color: 'rgba(255, 255, 255, 0.1)', drawBorder: false }},
+                            x: { ticks: { color: corTextoSecundario }, grid: { display: false }}
+                        },
+                        plugins: {
+                            legend: { labels: { color: corTextoPrincipal }},
+                            tooltip: { 
+                                backgroundColor: corFundoComponente,
+                                titleColor: corTextoPrincipal, bodyColor: corTextoSecundario,
+                                borderColor: 'rgba(255, 255, 255, 0.2)', borderWidth: 1,
+                                borderRadius: 5, padding: 10,
+                            }
+                        }
+                    }
+                });
+            }
+
+            // --- 7. INICIALIZAÇÃO ---
+            atualizarUIAuth(); // Mostra o botão de login no início
+            
+        }); // Fim do DOMContentLoaded
+    </script>
+</body>
+</html>
