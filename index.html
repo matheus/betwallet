@@ -11,23 +11,19 @@
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <!-- O CSS (style) permanece o mesmo -->
+    <!-- =================================
+       NOVO CSS - DESIGN MINIMALISTA
+       ================================= -->
     <style>
         :root {
-            --cor-fundo-principal: #1A1B30; 
-            --cor-fundo-componente: #262940; 
-            --cor-texto-principal: #E0E0E0; 
-            --cor-texto-secundario: #A0A0A0; 
-            --cor-texto-quase-preto: #0F0F20; 
-            --acento-verde-vibrante: #00FF8C;  
-            --acento-verde-transparente: rgba(0, 255, 140, 0.2); 
-            --acento-vermelho-vibrante: #FF4444; 
-            --acento-vermelho-transparente: rgba(255, 68, 68, 0.2);
-            --acento-cinza-neutro: #6c757d;    
-            --acento-gradiente-inicio: #A020F0; 
-            --acento-gradiente-fim: #FF00FF;   
-            --gradiente-roxo-magenta: linear-gradient(90deg, var(--acento-gradiente-inicio) 0%, var(--acento-gradiente-fim) 100%);
-            --gradiente-brilho-roxo: rgba(160, 32, 240, 0.3);
+            --cor-fundo-principal: #1f2430;
+            --cor-fundo-componente: #2d3445;
+            --cor-texto-principal: #e0e0e0;
+            --cor-texto-secundario: #9AA5B0;
+            --cor-sucesso: #4CAF50;
+            --cor-erro: #F44336;
+            --cor-neutro: #6c757d;
+            --cor-acao-principal: #6a5acd; /* Roxo/Azul suave */
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
@@ -35,12 +31,15 @@
             background-color: var(--cor-fundo-principal);
             color: var(--cor-texto-principal);
             padding-bottom: 80px; 
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
         nav {
             position: fixed; bottom: 0; left: 0; width: 100%;
             display: flex; justify-content: space-around;
             background-color: var(--cor-fundo-componente);
-            border-top: 1px solid #333; z-index: 100;
+            border-top: 1px solid #404a5e;
+            z-index: 100;
         }
         nav button {
             background: none; border: none; color: var(--cor-texto-secundario);
@@ -49,81 +48,68 @@
             transition: color 0.3s ease, border-top-color 0.3s ease;
         }
         nav button.active {
-            color: var(--acento-verde-vibrante); 
-            border-top-color: var(--acento-verde-vibrante);
+            color: var(--cor-acao-principal); 
+            border-top-color: var(--cor-acao-principal);
         }
         nav button:hover:not(.active) { color: var(--cor-texto-principal); }
-        nav button#btnNavAdicionar { color: var(--acento-gradiente-fim); }
-        nav button#btnNavAdicionar.active {
-            color: var(--acento-verde-vibrante); 
-            border-top-color: var(--acento-verde-vibrante);
-        }
         .tela {
             display: none; max-width: 600px; margin: 20px auto;
             padding: 0 15px; animation: fadeIn 0.3s ease-in-out;
         }
         .tela.active { display: block; }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        h1, h2 { margin-bottom: 20px; font-weight: 700; color: var(--cor-texto-principal); }
-        h2 { font-size: 1.2em; color: var(--cor-texto-secundario); }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        
+        h1 { margin-bottom: 24px; font-weight: 500; color: var(--cor-texto-principal); }
+        h2 { font-size: 1.2em; color: var(--cor-texto-secundario); margin-bottom: 16px; font-weight: 400; }
         
         #auth-container, #user-container {
             background-color: var(--cor-fundo-componente);
-            padding: 15px; border-radius: 8px; margin-bottom: 20px;
+            padding: 20px; border-radius: 8px; margin-bottom: 24px;
             text-align: center;
         }
         #user-container {
-            display: none; justify-content: space-between; align-items: center;
+            display: none; justify-content: space-between; align-items: center; padding: 15px 20px;
         }
-        #auth-container p, #user-container p {
-            margin-bottom: 10px; color: var(--cor-texto-secundario);
-        }
+        #auth-container p { margin-bottom: 16px; color: var(--cor-texto-secundario); line-height: 1.5; }
         #user-container p { margin-bottom: 0; font-size: 0.9em; }
-        #userName { color: var(--acento-verde-vibrante); font-weight: bold; }
+        #userName { color: var(--cor-texto-principal); font-weight: 500; }
+        
+        /* Botão Genérico */
+        .btn {
+            border: none; padding: 12px 20px; border-radius: 6px;
+            cursor: pointer; font-weight: 500; font-size: 0.95em;
+            transition: opacity 0.2s ease;
+        }
+        .btn:hover { opacity: 0.9; }
+
         button#btnLoginGoogle {
-            background: var(--gradiente-roxo-magenta);
-            color: var(--cor-texto-principal); border: none; padding: 10px 20px;
-            border-radius: 5px; cursor: pointer; font-weight: bold;
-            box-shadow: 0 0 10px var(--gradiente-brilho-roxo);
+            background-color: var(--cor-acao-principal);
+            color: white;
         }
         button#btnLogout {
-            background-color: var(--acento-cinza-neutro);
-            color: var(--cor-texto-principal); border: none; padding: 8px 15px;
-            border-radius: 5px; cursor: pointer; font-size: 0.8em;
+            background-color: var(--cor-neutro);
+            color: var(--cor-texto-principal);
+            padding: 8px 15px; font-size: 0.8em;
         }
         .cards-grid {
             display: grid; grid-template-columns: 1fr 1fr;
-            gap: 15px; margin-bottom: 30px;
+            gap: 16px; margin-bottom: 24px;
         }
         .card {
             background-color: var(--cor-fundo-componente);
             border-radius: 8px; padding: 20px; text-align: center;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            border-top: 2px solid var(--cor-fundo-componente);
-            transition: border-top-color 0.3s ease;
         }
         .card h3 {
             color: var(--cor-texto-secundario); font-size: 0.9em;
             margin-bottom: 8px; font-weight: 400;
         }
-        .card p { font-size: 1.8em; font-weight: 700; transition: text-shadow 0.3s ease; }
-        .card p.positivo {
-            color: var(--acento-verde-vibrante);
-            text-shadow: 0 0 10px var(--acento-verde-transparente);
-        }
-        .card p.negativo {
-            color: var(--acento-vermelho-vibrante);
-            text-shadow: 0 0 10px var(--acento-vermelho-transparente);
-        }
-        .card:has(p.positivo):hover { border-top-color: var(--acento-verde-vibrante); }
-        .card:has(p.negativo):hover { border-top-color: var(--acento-vermelho-vibrante); }
+        .card p { font-size: 1.8em; font-weight: 500; }
+        .card p.positivo { color: var(--cor-sucesso); }
+        .card p.negativo { color: var(--cor-erro); }
+        
         #grafico-container {
             background-color: var(--cor-fundo-componente);
             padding: 20px; border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
         }
         #form-adicionar { display: flex; flex-direction: column; gap: 20px; }
         .form-grupo { display: flex; flex-direction: column; }
@@ -131,15 +117,16 @@
             margin-bottom: 8px; color: var(--cor-texto-secundario); font-size: 0.9em;
         }
         .form-grupo input {
-            background-color: var(--cor-fundo-componente);
-            border: 1px solid #444; color: var(--cor-texto-principal);
-            padding: 15px; border-radius: 5px; font-size: 1.2em;
+            background-color: var(--cor-fundo-principal);
+            border: 1px solid var(--cor-fundo-componente);
+            color: var(--cor-texto-principal);
+            padding: 14px; border-radius: 6px; font-size: 1.1em;
             -moz-appearance: textfield; appearance: textfield;
             transition: border-color 0.3s ease, box-shadow 0.3s ease;
         }
         .form-grupo input:focus {
-            outline: none; border-color: var(--acento-verde-vibrante);
-            box-shadow: 0 0 10px var(--acento-verde-transparente);
+            outline: none; border-color: var(--cor-acao-principal);
+            box-shadow: 0 0 0 3px rgba(106, 90, 205, 0.3);
         }
         .form-grupo input::-webkit-outer-spin-button,
         .form-grupo input::-webkit-inner-spin-button {
@@ -150,23 +137,23 @@
             gap: 15px; margin-top: 10px;
         }
         .botoes-resultado button {
-            padding: 15px; font-size: 1em; font-weight: 700;
-            border: none; border-radius: 5px; cursor: pointer;
-            transition: transform 0.2s ease, box-shadow 0.3s ease;
+            padding: 15px; font-size: 1em; font-weight: 500;
+            border: none; border-radius: 6px; cursor: pointer;
+            transition: transform 0.2s ease, opacity 0.2s ease;
         }
-        .botoes-resultado button:active { transform: scale(0.95); }
+        .botoes-resultado button:hover { opacity: 0.9; }
+        .botoes-resultado button:active { transform: scale(0.97); }
+        
         #btnGanhei {
-            background-color: var(--acento-verde-vibrante);
-            color: var(--cor-texto-quase-preto); 
-            box-shadow: 0 0 10px var(--acento-verde-transparente);
+            background-color: var(--cor-sucesso);
+            color: white; 
         }
         #btnPerdi {
-            background-color: var(--acento-vermelho-vibrante);
-            color: var(--cor-texto-principal);
-            box-shadow: 0 0 10px var(--acento-vermelho-transparente);
+            background-color: var(--cor-erro);
+            color: white;
         }
         #btnDevolvida {
-            background-color: var(--acento-cinza-neutro);
+            background-color: var(--cor-neutro);
             color: var(--cor-texto-principal);
             grid-column: 1 / -1; 
         }
@@ -174,56 +161,45 @@
         .item-historico {
             display: flex; justify-content: space-between; align-items: center;
             background-color: var(--cor-fundo-componente);
-            padding: 15px; border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            border-left: 3px solid transparent; 
-            transition: border-left-color 0.3s ease;
+            padding: 15px; border-radius: 6px;
         }
-        .item-historico:hover { border-left-color: var(--cor-texto-secundario); }
-        .item-historico:has(.positivo):hover { border-left-color: var(--acento-verde-vibrante); }
-        .item-historico:has(.negativo):hover { border-left-color: var(--acento-vermelho-vibrante); }
         .item-historico div p:first-child { font-weight: 500; font-size: 1.1em; }
-        .item-historico div p:first-child.positivo {
-            color: var(--acento-verde-vibrante);
-            text-shadow: 0 0 5px var(--acento-verde-transparente);
-        }
-        .item-historico div p:first-child.negativo {
-            color: var(--acento-vermelho-vibrante);
-            text-shadow: 0 0 5px var(--acento-vermelho-transparente);
-        }
+        .item-historico div p:first-child.positivo { color: var(--cor-sucesso); }
+        .item-historico div p:first-child.negativo { color: var(--cor-erro); }
         .item-historico div p:first-child.neutro { color: var(--cor-texto-secundario); }
         .item-historico div p.detalhes {
             font-size: 0.8em; color: var(--cor-texto-secundario); margin-top: 5px;
         }
         .item-historico button.btn-delete {
-            background: none; border: none; color: var(--acento-vermelho-vibrante);
+            background: none; border: none; color: var(--cor-erro);
             font-size: 1.2em; font-weight: bold; cursor: pointer;
             transition: color 0.2s ease;
         }
-        .item-historico button.btn-delete:hover { color: #FF7070; }
+        .item-historico button.btn-delete:hover { color: #ff7070; }
+        
         #btnLimparHistorico {
-            margin-top: 20px; background: var(--gradiente-roxo-magenta); 
-            color: var(--cor-texto-principal); border: none; padding: 15px;
-            border-radius: 5px; cursor: pointer; width: 100%;
-            font-weight: 700; font-size: 1em;
-            box-shadow: 0 0 10px var(--gradiente-brilho-roxo);
+            margin-top: 20px; background: var(--cor-erro); 
+            color: white; border: none; padding: 14px;
+            border-radius: 6px; cursor: pointer; width: 100%;
+            font-weight: 500; font-size: 1em;
             transition: opacity 0.3s ease;
         }
         #btnLimparHistorico:hover { opacity: 0.9; }
     </style>
+
 </head>
 <body>
 
-    <!-- O HTML do body permanece o mesmo -->
+    <!-- HTML do Body (sem mudanças) -->
     <main id="telaDashboard" class="tela active">
         <h1>Meu Dashboard</h1>
         <div id="auth-container">
             <p>Faça login para salvar seus dados na nuvem e acessar de qualquer dispositivo!</p>
-            <button id="btnLoginGoogle">Login com Google</button>
+            <button id="btnLoginGoogle" class="btn">Login com Google</button>
         </div>
         <div id="user-container">
             <p>Logado como: <span id="userName"></span></p>
-            <button id="btnLogout">Sair</button>
+            <button id="btnLogout" class="btn">Sair</button>
         </div>
         <div class="cards-grid">
             <div class="card">
@@ -279,18 +255,13 @@
 
 
     <!-- ========================================================
-       JAVASCRIPT DO APLICATIVO (ATUALIZADO PARA v12+ MODULAR)
+       JAVASCRIPT DO APLICATIVO
+       (Movido para o final do BODY para corrigir o erro 'getContext')
        ======================================================== -->
-    
-    <!-- 
-      Usamos type="module" para poder usar 'import' 
-      Este é o único <script> que precisamos.
-    -->
     <script type="module">
     
         // --- 0. IMPORTS E CONFIGURAÇÃO DO FIREBASE ---
         
-        // Importa as funções que precisamos da SDK v12+
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
         import { 
             getAuth, 
@@ -312,11 +283,13 @@
             writeBatch 
         } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
 
-        // SUA CONFIGURAÇÃO (COLE SUA API KEY AQUI!)
+        // ===================================================================
+        // !! IMPORTANTE !!
+        // Cole sua API Key real (que começa com "AIzaSy...")
+        // no lugar de "SUA_API_KEY_AQUI" abaixo.
+        // ===================================================================
         const firebaseConfig = {
-            // !! IMPORTANTE !!
-            // Cole sua apiKey que você censurou (começa com "AIzaSy...")
-            apiKey: "SUA_API_KEY_AQUI", 
+            apiKey: "AIzaSyBzSUV_YWgyUGeNBvJ78VZjDqfeSh3XIWE", // <-- COLE SUA API KEY REAL AQUI!
             authDomain: "gestor-banca-mvp.firebaseapp.com",
             projectId: "gestor-banca-mvp",
             storageBucket: "gestor-banca-mvp.firebasestorage.app",
@@ -330,368 +303,345 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
         const provider = new GoogleAuthProvider();
-
         
         // --- 1. REFERÊNCIAS AOS ELEMENTOS DO DOM ---
         
-        // Espera o DOM carregar para rodar o app
-        document.addEventListener('DOMContentLoaded', () => {
+        // Como o script está no fim do body, não precisamos mais do 'DOMContentLoaded'
+        // Podemos referenciar os elementos diretamente.
         
-            // Telas
-            const telaDashboard = document.getElementById('telaDashboard');
-            const telaAdicionar = document.getElementById('telaAdicionar');
-            const telaHistorico = document.getElementById('telaHistorico');
-            const telas = [telaDashboard, telaAdicionar, telaHistorico];
+        const telaDashboard = document.getElementById('telaDashboard');
+        const telaAdicionar = document.getElementById('telaAdicionar');
+        const telaHistorico = document.getElementById('telaHistorico');
+        const telas = [telaDashboard, telaAdicionar, telaHistorico];
 
-            // Botões de Navegação
-            const btnNavDashboard = document.getElementById('btnNavDashboard');
-            const btnNavAdicionar = document.getElementById('btnNavAdicionar');
-            const btnNavHistorico = document.getElementById('btnNavHistorico');
-            const navButtons = [btnNavDashboard, btnNavAdicionar, btnNavHistorico];
+        const btnNavDashboard = document.getElementById('btnNavDashboard');
+        const btnNavAdicionar = document.getElementById('btnNavAdicionar');
+        const btnNavHistorico = document.getElementById('btnNavHistorico');
+        const navButtons = [btnNavDashboard, btnNavAdicionar, btnNavHistorico];
 
-            // Autenticação
-            const authContainer = document.getElementById('auth-container');
-            const userContainer = document.getElementById('user-container');
-            const btnLoginGoogle = document.getElementById('btnLoginGoogle');
-            const btnLogout = document.getElementById('btnLogout');
-            const userNameEl = document.getElementById('userName');
+        const authContainer = document.getElementById('auth-container');
+        const userContainer = document.getElementById('user-container');
+        const btnLoginGoogle = document.getElementById('btnLoginGoogle');
+        const btnLogout = document.getElementById('btnLogout');
+        const userNameEl = document.getElementById('userName');
 
-            // Formulário Adicionar
-            const inputStake = document.getElementById('inputStake');
-            const inputOdd = document.getElementById('inputOdd');
-            const btnGanhei = document.getElementById('btnGanhei');
-            const btnPerdi = document.getElementById('btnPerdi');
-            const btnDevolvida = document.getElementById('btnDevolvida');
+        const inputStake = document.getElementById('inputStake');
+        const inputOdd = document.getElementById('inputOdd');
+        const btnGanhei = document.getElementById('btnGanhei');
+        const btnPerdi = document.getElementById('btnPerdi');
+        const btnDevolvida = document.getElementById('btnDevolvida');
 
-            // Dashboard Cards
-            const lucroTotalEl = document.getElementById('lucroTotalEl');
-            const roiEl = document.getElementById('roiEl');
-            const winrateEl = document.getElementById('winrateEl');
-            const totalInvestidoEl = document.getElementById('totalInvestidoEl');
-            
-            // Histórico
-            const listaHistorico = document.getElementById('listaHistorico');
-            const btnLimparHistorico = document.getElementById('btnLimparHistorico');
+        const lucroTotalEl = document.getElementById('lucroTotalEl');
+        const roiEl = document.getElementById('roiEl');
+        const winrateEl = document.getElementById('winrateEl');
+        const totalInvestidoEl = document.getElementById('totalInvestidoEl');
+        
+        const listaHistorico = document.getElementById('listaHistorico');
+        const btnLimparHistorico = document.getElementById('btnLimparHistorico');
 
-            // Gráfico
-            const ctx = document.getElementById('graficoEvolucao').getContext('2d');
-            let meuGrafico; 
+        // Esta linha agora funciona, pois o <canvas> já existe
+        const ctx = document.getElementById('graficoEvolucao').getContext('2d');
+        let meuGrafico; 
 
-            // --- 2. ESTADO DO APLICATIVO (DADOS) ---
-            let apostas = []; 
-            let currentUser = null; 
-            const DB_KEY = 'gestorBancaMVP_apostas'; 
-            
-            const estiloComputado = getComputedStyle(document.body);
-            const corVerdeNeon = estiloComputado.getPropertyValue('--acento-verde-vibrante');
-            const corTextoSecundario = estiloComputado.getPropertyValue('--cor-texto-secundario');
-            const corTextoPrincipal = estiloComputado.getPropertyValue('--cor-texto-principal');
-            const corFundoComponente = estiloComputado.getPropertyValue('--cor-fundo-componente');
+        // --- 2. ESTADO DO APLICATIVO (DADOS) ---
+        let apostas = []; 
+        let currentUser = null; 
+        const DB_KEY = 'gestorBancaMVP_apostas'; 
+        
+        const estiloComputado = getComputedStyle(document.body);
+        const corVerde = estiloComputado.getPropertyValue('--cor-sucesso');
+        const corTextoSecundario = estiloComputado.getPropertyValue('--cor-texto-secundario');
+        const corTextoPrincipal = estiloComputado.getPropertyValue('--cor-texto-principal');
+        const corFundoComponente = estiloComputado.getPropertyValue('--cor-fundo-componente');
 
-
-            // --- 3. FUNÇÕES DE AUTENTICAÇÃO (Modular) ---
-            
-            function atualizarUIAuth() {
-                if (currentUser) {
-                    authContainer.style.display = 'none';
-                    userContainer.style.display = 'flex';
-                    userNameEl.textContent = currentUser.displayName || currentUser.email;
-                } else {
-                    authContainer.style.display = 'block';
-                    userContainer.style.display = 'none';
-                    userNameEl.textContent = '';
+        // --- 3. FUNÇÕES DE AUTENTICAÇÃO (Modular) ---
+        function atualizarUIAuth() {
+            if (currentUser) {
+                authContainer.style.display = 'none';
+                userContainer.style.display = 'flex';
+                userNameEl.textContent = currentUser.displayName || currentUser.email;
+            } else {
+                authContainer.style.display = 'block';
+                userContainer.style.display = 'none';
+                userNameEl.textContent = '';
+            }
+        }
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUser = user;
+                atualizarUIAuth();
+                await syncLocalToFirestore();
+            } else {
+                currentUser = null;
+                atualizarUIAuth();
+            }
+            navegar('telaDashboard');
+        });
+        btnLoginGoogle.addEventListener('click', () => {
+            signInWithPopup(auth, provider)
+                .catch(error => console.error("Erro no login:", error));
+        });
+        btnLogout.addEventListener('click', () => {
+            signOut(auth)
+                .catch(error => console.error("Erro no logout:", error));
+        });
+        async function syncLocalToFirestore() {
+            const localApostas = JSON.parse(localStorage.getItem(DB_KEY)) || [];
+            if (localApostas.length > 0 && currentUser) {
+                if (confirm(`Encontramos ${localApostas.length} apostas salvas localmente. Deseja enviá-las para sua conta na nuvem?`)) {
+                    const batch = writeBatch(db);
+                    localApostas.forEach(aposta => {
+                        aposta.userId = currentUser.uid; 
+                        const docRef = doc(db, 'apostas', aposta.id);
+                        batch.set(docRef, aposta, { merge: true });
+                    });
+                    try {
+                        await batch.commit();
+                        console.log("Dados locais sincronizados com sucesso!");
+                        localStorage.removeItem(DB_KEY);
+                    } catch (e) {
+                        console.error("Erro ao sincronizar dados:", e);
+                        alert("Houve um erro ao sincronizar seus dados. Tente novamente.");
+                    }
                 }
             }
+            // Não precisa chamar atualizarDados/renderizarGrafico aqui,
+            // pois o 'onAuthStateChanged' já chama o 'navegar("dashboard")'
+        }
 
-            // Ouve as mudanças de estado (Login, Logout)
-            onAuthStateChanged(auth, async (user) => {
-                if (user) {
-                    currentUser = user;
-                    atualizarUIAuth();
-                    await syncLocalToFirestore();
-                } else {
-                    currentUser = null;
-                    atualizarUIAuth();
-                }
-                navegar('telaDashboard');
-            });
-
-            // Lógica de Login
-            btnLoginGoogle.addEventListener('click', () => {
-                signInWithPopup(auth, provider)
-                    .catch(error => console.error("Erro no login:", error));
-            });
-
-            // Lógica de Logout
-            btnLogout.addEventListener('click', () => {
-                signOut(auth)
-                    .catch(error => console.error("Erro no logout:", error));
-            });
+        // --- 4. FUNÇÕES DE NAVEGAÇÃO (Async) ---
+        async function navegar(telaId) {
+            telas.forEach(tela => tela.classList.remove('active'));
+            navButtons.forEach(btn => btn.classList.remove('active'));
             
-            // Lógica de Sincronização (Modular)
-            async function syncLocalToFirestore() {
+            if (telaId === 'telaDashboard') {
+                telaDashboard.classList.add('active');
+                btnNavDashboard.classList.add('active');
+                await atualizarDados(); 
+                renderizarGrafico();    
+            } else if (telaId === 'telaAdicionar') {
+                telaAdicionar.classList.add('active');
+                btnNavAdicionar.classList.add('active');
+            } else if (telaId === 'telaHistorico') {
+                telaHistorico.classList.add('active');
+                btnNavHistorico.classList.add('active');
+                await atualizarDados(); 
+            }
+        }
+        btnNavDashboard.addEventListener('click', () => navegar('telaDashboard'));
+        btnNavAdicionar.addEventListener('click', () => navegar('telaAdicionar'));
+        btnNavHistorico.addEventListener('click', () => navegar('telaHistorico'));
+
+        // --- 5. FUNÇÕES DE DADOS (CRUD Modular) ---
+        async function carregarApostas() {
+            if (currentUser) {
+                try {
+                    const apostasRef = collection(db, 'apostas');
+                    const q = query(apostasRef, where('userId', '==', currentUser.uid), orderBy('data', 'asc'));
+                    const snapshot = await getDocs(q);
+                    apostas = snapshot.docs.map(doc => doc.data());
+                } catch (e) {
+                    console.error("Erro ao carregar do Firestore:", e);
+                    apostas = [];
+                }
+            } else {
+                apostas = JSON.parse(localStorage.getItem(DB_KEY)) || [];
+            }
+        }
+        async function adicionarAposta(resultado) {
+            const stake = parseFloat(inputStake.value);
+            const odd = parseFloat(inputOdd.value);
+            if (isNaN(stake) || isNaN(odd) || stake <= 0 || odd <= 1) {
+                alert('Valores inválidos. Stake deve ser > 0 e Odd > 1.'); return;
+            }
+            let lucro = 0;
+            if (resultado === 'ganha') { lucro = (stake * odd) - stake; }
+            else if (resultado === 'perdida') { lucro = -stake; }
+            
+            const novaAposta = {
+                id: Date.now().toString(),
+                stake: stake, odd: odd, resultado: resultado, lucro: lucro,
+                data: new Date().toISOString(),
+                userId: currentUser ? currentUser.uid : null 
+            };
+            
+            if (currentUser) {
+                try {
+                    await setDoc(doc(db, 'apostas', novaAposta.id), novaAposta);
+                } catch (e) {
+                    console.error("Erro ao salvar no Firestore:", e);
+                    alert("Erro ao salvar. Verifique sua conexão."); return;
+                }
+            } else {
                 const localApostas = JSON.parse(localStorage.getItem(DB_KEY)) || [];
-                
-                if (localApostas.length > 0 && currentUser) {
-                    if (confirm(`Encontramos ${localApostas.length} apostas salvas localmente. Deseja enviá-las para sua conta na nuvem?`)) {
-                        const batch = writeBatch(db); // Modular
-                        
-                        localApostas.forEach(aposta => {
-                            aposta.userId = currentUser.uid; 
-                            const docRef = doc(db, 'apostas', aposta.id); // Modular
-                            batch.set(docRef, aposta, { merge: true }); // Modular
-                        });
-                        
-                        try {
-                            await batch.commit(); // Modular
-                            console.log("Dados locais sincronizados com sucesso!");
-                            localStorage.removeItem(DB_KEY);
-                        } catch (e) {
-                            console.error("Erro ao sincronizar dados:", e);
-                            alert("Houve um erro ao sincronizar seus dados. Tente novamente.");
-                        }
-                    }
-                }
-                await atualizarDados();
-                renderizarGrafico();
+                localApostas.push(novaAposta);
+                localStorage.setItem(DB_KEY, JSON.stringify(localApostas));
             }
-
-            // --- 4. FUNÇÕES DE NAVEGAÇÃO (Async) ---
-            async function navegar(telaId) {
-                telas.forEach(tela => tela.classList.remove('active'));
-                navButtons.forEach(btn => btn.classList.remove('active'));
-
-                if (telaId === 'telaDashboard') {
-                    telaDashboard.classList.add('active');
-                    btnNavDashboard.classList.add('active');
-                    await atualizarDados(); 
-                    renderizarGrafico();    
-                } else if (telaId === 'telaAdicionar') {
-                    telaAdicionar.classList.add('active');
-                    btnNavAdicionar.classList.add('active');
-                } else if (telaId === 'telaHistorico') {
-                    telaHistorico.classList.add('active');
-                    btnNavHistorico.classList.add('active');
-                    await atualizarDados(); 
-                }
-            }
-            btnNavDashboard.addEventListener('click', () => navegar('telaDashboard'));
-            btnNavAdicionar.addEventListener('click', () => navegar('telaAdicionar'));
-            btnNavHistorico.addEventListener('click', () => navegar('telaHistorico'));
-
-            // --- 5. FUNÇÕES DE DADOS (CRUD Modular) ---
-            async function carregarApostas() {
+            inputStake.value = ''; inputOdd.value = '';
+            navegar('telaDashboard');
+        }
+        async function deletarAposta(id) {
+            if (confirm('Tem certeza que deseja excluir esta aposta?')) {
                 if (currentUser) {
                     try {
-                        const apostasRef = collection(db, 'apostas'); // Modular
-                        const q = query(apostasRef, where('userId', '==', currentUser.uid), orderBy('data', 'asc')); // Modular
-                        const snapshot = await getDocs(q); // Modular
-                        apostas = snapshot.docs.map(doc => doc.data());
-                    } catch (e) {
-                        console.error("Erro ao carregar do Firestore:", e);
-                        apostas = [];
-                    }
+                        await deleteDoc(doc(db, 'apostas', id));
+                    } catch (e) { console.error("Erro ao deletar do Firestore:", e); return; }
                 } else {
-                    apostas = JSON.parse(localStorage.getItem(DB_KEY)) || [];
-                }
-            }
-            
-            async function adicionarAposta(resultado) {
-                const stake = parseFloat(inputStake.value);
-                const odd = parseFloat(inputOdd.value);
-                if (isNaN(stake) || isNaN(odd) || stake <= 0 || odd <= 1) {
-                    alert('Valores inválidos. Stake deve ser > 0 e Odd > 1.'); return;
-                }
-                let lucro = 0;
-                if (resultado === 'ganha') { lucro = (stake * odd) - stake; }
-                else if (resultado === 'perdida') { lucro = -stake; }
-                
-                const novaAposta = {
-                    id: Date.now().toString(),
-                    stake: stake, odd: odd, resultado: resultado, lucro: lucro,
-                    data: new Date().toISOString(),
-                    userId: currentUser ? currentUser.uid : null 
-                };
-                
-                if (currentUser) {
-                    try {
-                        await setDoc(doc(db, 'apostas', novaAposta.id), novaAposta); // Modular
-                    } catch (e) {
-                        console.error("Erro ao salvar no Firestore:", e);
-                        alert("Erro ao salvar. Verifique sua conexão."); return;
-                    }
-                } else {
-                    const localApostas = JSON.parse(localStorage.getItem(DB_KEY)) || [];
-                    localApostas.push(novaAposta);
+                    let localApostas = JSON.parse(localStorage.getItem(DB_KEY)) || [];
+                    localApostas = localApostas.filter(aposta => aposta.id !== id);
                     localStorage.setItem(DB_KEY, JSON.stringify(localApostas));
                 }
-                inputStake.value = ''; inputOdd.value = '';
-                navegar('telaDashboard');
+                await atualizarDados(); 
+                if (telaDashboard.classList.contains('active')) { renderizarGrafico(); }
             }
-            
-            async function deletarAposta(id) {
-                if (confirm('Tem certeza que deseja excluir esta aposta?')) {
-                    if (currentUser) {
-                        try {
-                            await deleteDoc(doc(db, 'apostas', id)); // Modular
-                        } catch (e) { console.error("Erro ao deletar do Firestore:", e); return; }
-                    } else {
-                        let localApostas = JSON.parse(localStorage.getItem(DB_KEY)) || [];
-                        localApostas = localApostas.filter(aposta => aposta.id !== id);
-                        localStorage.setItem(DB_KEY, JSON.stringify(localApostas));
-                    }
-                    await atualizarDados(); 
-                    if (telaDashboard.classList.contains('active')) { renderizarGrafico(); }
+        }
+        async function limparHistorico() {
+            if (confirm('ATENÇÃO! Isso apagará TODAS as suas apostas salvas. Deseja continuar?')) {
+                if (currentUser) {
+                    try {
+                        const apostasRef = collection(db, 'apostas');
+                        const q = query(apostasRef, where('userId', '==', currentUser.uid));
+                        const snapshot = await getDocs(q);
+                        const batch = writeBatch(db);
+                        snapshot.docs.forEach(doc => batch.delete(doc.ref));
+                        await batch.commit();
+                    } catch (e) { console.error("Erro ao limpar o Firestore:", e); return; }
+                } else {
+                    localStorage.removeItem(DB_KEY);
                 }
+                await atualizarDados();
+                if (telaDashboard.classList.contains('active')) { renderizarGrafico(); }
             }
-            
-            async function limparHistorico() {
-                if (confirm('ATENÇÃO! Isso apagará TODAS as suas apostas salvas. Deseja continuar?')) {
-                    if (currentUser) {
-                        try {
-                            const apostasRef = collection(db, 'apostas'); // Modular
-                            const q = query(apostasRef, where('userId', '==', currentUser.uid)); // Modular
-                            const snapshot = await getDocs(q); // Modular
-                            const batch = writeBatch(db); // Modular
-                            snapshot.docs.forEach(doc => batch.delete(doc.ref));
-                            await batch.commit(); // Modular
-                        } catch (e) { console.error("Erro ao limpar o Firestore:", e); return; }
-                    } else {
-                        localStorage.removeItem(DB_KEY);
-                    }
-                    await atualizarDados();
-                    if (telaDashboard.classList.contains('active')) { renderizarGrafico(); }
-                }
+        }
+        btnGanhei.addEventListener('click', () => adicionarAposta('ganha'));
+        btnPerdi.addEventListener('click', () => adicionarAposta('perdida'));
+        btnDevolvida.addEventListener('click', () => adicionarAposta('devolvida'));
+        listaHistorico.addEventListener('click', (e) => {
+            if (e.target.classList.contains('btn-delete')) {
+                deletarAposta(e.target.dataset.id);
             }
-            
-            btnGanhei.addEventListener('click', () => adicionarAposta('ganha'));
-            btnPerdi.addEventListener('click', () => adicionarAposta('perdida'));
-            btnDevolvida.addEventListener('click', () => adicionarAposta('devolvida'));
-            
-            listaHistorico.addEventListener('click', (e) => {
-                if (e.target.classList.contains('btn-delete')) {
-                    deletarAposta(e.target.dataset.id);
+        });
+        btnLimparHistorico.addEventListener('click', limparHistorico);
+
+        // --- FUNÇÕES DE RENDERIZAÇÃO ---
+        async function atualizarDados() {
+            await carregarApostas(); 
+            renderizarDashboard();   
+            renderizarHistorico(); 
+        }
+        function formatarDinheiro(valor) {
+            return valor.toLocaleString('pt-br', { style: 'currency', currency: 'BRL' });
+        }
+        function renderizarDashboard() {
+            let lucroTotal = 0, totalInvestido = 0, ganhas = 0, totalApostasValidas = 0; 
+            apostas.forEach(aposta => {
+                lucroTotal += aposta.lucro;
+                if (aposta.resultado !== 'devolvida') {
+                    totalInvestido += aposta.stake;
+                    totalApostasValidas++;
+                    if(aposta.resultado === 'ganha') ganhas++;
                 }
             });
-            btnLimparHistorico.addEventListener('click', limparHistorico);
-
-            // --- 6. FUNÇÕES DE RENDERIZAÇÃO (Idênticas a antes) ---
-            async function atualizarDados() {
-                await carregarApostas(); 
-                renderizarDashboard();   
-                renderizarHistorico(); 
+            const roi = totalInvestido > 0 ? (lucroTotal / totalInvestido) * 100 : 0;
+            const winrate = totalApostasValidas > 0 ? (ganhas / totalApostasValidas) * 100 : 0;
+            lucroTotalEl.textContent = formatarDinheiro(lucroTotal);
+            lucroTotalEl.className = (lucroTotal > 0) ? 'positivo' : (lucroTotal < 0) ? 'negativo' : '';
+            roiEl.textContent = `${roi.toFixed(1)}%`;
+            roiEl.className = (roi > 0) ? 'positivo' : (roi < 0) ? 'negativo' : '';
+            winrateEl.textContent = `${winrate.toFixed(1)}%`;
+            totalInvestidoEl.textContent = formatarDinheiro(totalInvestido);
+        }
+        function renderizarHistorico() {
+            listaHistorico.innerHTML = ''; 
+            if (apostas.length === 0) {
+                listaHistorico.innerHTML = '<p style="text-align: center; color: var(--cor-texto-secundario);">Nenhuma aposta registrada.</p>';
+                return;
             }
-            function formatarDinheiro(valor) {
-                return valor.toLocaleString('pt-br', { style: 'currency', currency: 'BRL' });
-            }
-            function renderizarDashboard() {
-                let lucroTotal = 0, totalInvestido = 0, ganhas = 0, totalApostasValidas = 0; 
-                apostas.forEach(aposta => {
-                    lucroTotal += aposta.lucro;
-                    if (aposta.resultado !== 'devolvida') {
-                        totalInvestido += aposta.stake;
-                        totalApostasValidas++;
-                        if(aposta.resultado === 'ganha') ganhas++;
-                    }
+            const apostasReversas = [...apostas].reverse(); 
+            apostasReversas.forEach(aposta => {
+                let classeResultado = 'neutro', sinalLucro = '';
+                if (aposta.lucro > 0) { classeResultado = 'positivo'; sinalLucro = '+'; }
+                else if (aposta.lucro < 0) { classeResultado = 'negativo'; }
+                const dataFormatada = new Date(aposta.data).toLocaleString('pt-BR', {
+                    day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' 
                 });
-                const roi = totalInvestido > 0 ? (lucroTotal / totalInvestido) * 100 : 0;
-                const winrate = totalApostasValidas > 0 ? (ganhas / totalApostasValidas) * 100 : 0;
-                lucroTotalEl.textContent = formatarDinheiro(lucroTotal);
-                lucroTotalEl.className = (lucroTotal > 0) ? 'positivo' : (lucroTotal < 0) ? 'negativo' : '';
-                roiEl.textContent = `${roi.toFixed(1)}%`;
-                roiEl.className = (roi > 0) ? 'positivo' : (roi < 0) ? 'negativo' : '';
-                winrateEl.textContent = `${winrate.toFixed(1)}%`;
-                totalInvestidoEl.textContent = formatarDinheiro(totalInvestido);
-            }
-            function renderizarHistorico() {
-                listaHistorico.innerHTML = ''; 
-                if (apostas.length === 0) {
-                    listaHistorico.innerHTML = '<p style="text-align: center; color: var(--cor-texto-secundario);">Nenhuma aposta registrada.</p>';
-                    return;
-                }
-                const apostasReversas = [...apostas].reverse(); 
-                apostasReversas.forEach(aposta => {
-                    let classeResultado = 'neutro', sinalLucro = '';
-                    if (aposta.lucro > 0) { classeResultado = 'positivo'; sinalLucro = '+'; }
-                    else if (aposta.lucro < 0) { classeResultado = 'negativo'; }
-                    const dataFormatada = new Date(aposta.data).toLocaleString('pt-BR', {
-                        day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' 
-                    });
-                    const itemHTML = `
-                        <div class="item-historico">
-                            <div>
-                                <p class="${classeResultado}">
-                                    ${sinalLucro}${formatarDinheiro(aposta.lucro)}
-                                </p>
-                                <p class="detalhes">
-                                    Apostado: ${formatarDinheiro(aposta.stake)} @ ${aposta.odd.toFixed(2)} (${aposta.resultado})
-                                    <br> ${dataFormatada}
-                                </p>
-                            </div>
-                            <button class="btn-delete" data-id="${aposta.id}">X</button>
-                        </div>`;
-                    listaHistorico.innerHTML += itemHTML;
-                });
-            }
-            function renderizarGrafico() {
-                if (meuGrafico) { meuGrafico.destroy(); }
-                let lucroAcumulado = 0;
-                const dadosGrafico = [0]; 
-                const labelsGrafico = ['Início'];
-                apostas.forEach((aposta, index) => {
-                    lucroAcumulado += aposta.lucro;
-                    dadosGrafico.push(lucroAcumulado);
-                    labelsGrafico.push(`Aposta ${index + 1}`);
-                });
-                meuGrafico = new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: labelsGrafico,
-                        datasets: [{
-                            label: 'Lucro Acumulado',
-                            data: dadosGrafico,
-                            borderColor: corVerdeNeon, 
-                            borderWidth: 2, 
-                            backgroundColor: (context) => {
-                                const chart = context.chart;
-                                const {ctx, chartArea} = chart;
-                                if (!chartArea) { return null; }
-                                const gradient = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
-                                gradient.addColorStop(0, 'rgba(0, 255, 140, 0.4)'); 
-                                gradient.addColorStop(1, 'rgba(0, 255, 140, 0)');  
-                                return gradient;
-                            },
-                            fill: true, tension: 0.4, 
-                            pointBackgroundColor: corVerdeNeon, 
-                            pointBorderColor: corFundoComponente,
-                            pointRadius: 4, pointHoverRadius: 6,
-                            pointHoverBackgroundColor: '#fff',
-                            pointHoverBorderColor: corVerdeNeon
-                        }]
-                    },
-                    options: {
-                        responsive: true, maintainAspectRatio: false, 
-                        scales: {
-                            y: { ticks: { color: corTextoSecundario }, grid: { color: 'rgba(255, 255, 255, 0.1)', drawBorder: false }},
-                            x: { ticks: { color: corTextoSecundario }, grid: { display: false }}
+                const itemHTML = `
+                    <div class="item-historico">
+                        <div>
+                            <p class="${classeResultado}">
+                                ${sinalLucro}${formatarDinheiro(aposta.lucro)}
+                            </p>
+                            <p class="detalhes">
+                                Apostado: ${formatarDinheiro(aposta.stake)} @ ${aposta.odd.toFixed(2)} (${aposta.resultado})
+                                <br> ${dataFormatada}
+                            </p>
+                        </div>
+                        <button class="btn-delete" data-id="${aposta.id}">X</button>
+                    </div>`;
+                listaHistorico.innerHTML += itemHTML;
+            });
+        }
+        function renderizarGrafico() {
+            if (meuGrafico) { meuGrafico.destroy(); }
+            let lucroAcumulado = 0;
+            const dadosGrafico = [0]; 
+            const labelsGrafico = ['Início'];
+            apostas.forEach((aposta, index) => {
+                lucroAcumulado += aposta.lucro;
+                dadosGrafico.push(lucroAcumulado);
+                labelsGrafico.push(`Aposta ${index + 1}`);
+            });
+            meuGrafico = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labelsGrafico,
+                    datasets: [{
+                        label: 'Lucro Acumulado',
+                        data: dadosGrafico,
+                        borderColor: corVerde, // Cor verde mais suave para a linha
+                        borderWidth: 2, 
+                        backgroundColor: (context) => {
+                            const chart = context.chart;
+                            const {ctx, chartArea} = chart;
+                            if (!chartArea) { return null; }
+                            const gradient = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+                            gradient.addColorStop(0, 'rgba(76, 175, 80, 0.4)'); // Verde suave com transparência
+                            gradient.addColorStop(1, 'rgba(76, 175, 80, 0)');  // Transparente
+                            return gradient;
                         },
-                        plugins: {
-                            legend: { labels: { color: corTextoPrincipal }},
-                            tooltip: { 
-                                backgroundColor: corFundoComponente,
-                                titleColor: corTextoPrincipal, bodyColor: corTextoSecundario,
-                                borderColor: 'rgba(255, 255, 255, 0.2)', borderWidth: 1,
-                                borderRadius: 5, padding: 10,
-                            }
+                        fill: true, tension: 0.4, 
+                        pointBackgroundColor: corVerde, 
+                        pointBorderColor: corFundoComponente,
+                        pointRadius: 4, pointHoverRadius: 6,
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: corVerde
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false, 
+                    scales: {
+                        y: { ticks: { color: corTextoSecundario }, grid: { color: 'rgba(255, 255, 255, 0.1)', drawBorder: false }},
+                        x: { ticks: { color: corTextoSecundario }, grid: { display: false }}
+                    },
+                    plugins: {
+                        legend: { labels: { color: corTextoPrincipal }},
+                        tooltip: { 
+                            backgroundColor: corFundoComponente,
+                            titleColor: corTextoPrincipal, bodyColor: corTextoSecundario,
+                            borderColor: 'rgba(255, 255, 255, 0.2)', borderWidth: 1,
+                            borderRadius: 5, padding: 10,
                         }
                     }
-                });
-            }
-
-            // --- 7. INICIALIZAÇÃO ---
-            atualizarUIAuth(); // Mostra o botão de login no início
-            
-        }); // Fim do DOMContentLoaded
+                }
+            });
+        }
+        
+        // --- 7. INICIALIZAÇÃO ---
+        atualizarUIAuth(); // Mostra o botão de login no início
+        // A chamada principal 'navegar('telaDashboard')' agora é
+        // acionada pelo 'onAuthStateChanged'
+        
     </script>
 </body>
 </html>
+
